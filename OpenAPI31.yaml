@@ -1,0 +1,92 @@
+openapi: 3.1.0
+info:
+  title: Intent Classification API
+  version: "0.1"
+  description: >
+    API for predicting user intent using a fine-tuned BERT model.
+    Accepts user text input and returns the predicted intent class and confidence.
+
+paths:
+  /v1/intents:predict:
+    post:
+      summary: Predict user intent
+      description: Takes user input and returns predicted intent ID and confidence score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredictRequest"
+      responses:
+        "200":
+          description: Successful prediction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictResponse"
+        "400":
+          description: Invalid argument (empty or malformed input)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+        "422":
+          description: Validation error (schema-level failure)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+
+components:
+  schemas:
+    PredictRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: User input text for intent classification
+    PredictResponse:
+      type: object
+      properties:
+        intentId:
+          type: integer
+          description: Predicted intent label (numeric)
+        confidence:
+          type: number
+          format: float
+          description: Confidence score (0.0 - 1.0)
+    Status:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+    ValidationError:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            type: object
+            properties:
+              loc:
+                type: array
+                items:
+                  type: string
+              msg:
+                type: string
+              type:
+                type: string
